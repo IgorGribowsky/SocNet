@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SocNet.Core.Entities
 {
-    class Subscription
+    public class Subscription
     {
         public int SubscriberUserId { get; set; }
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SocNet.Core.Entities
 {
-    class Repost
+    public class Repost
     {
         public int Id { get; private set; }
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SocNet.Core.Entities
 {
-    class User
+    public class User
     {
         public int Id { get; private set; }
 

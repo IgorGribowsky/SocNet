@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SocNet.Core.Entities
 {
-    class Post
+    public class Post
     {
         public int Id { get; private set; }
 

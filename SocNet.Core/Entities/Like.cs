@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SocNet.Core.Entities
 {
-    class Like
+    public class Like
     {
         public int PostId { get; set; }
 
