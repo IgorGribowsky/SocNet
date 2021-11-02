@@ -8,7 +8,7 @@ using SocNet.Core.Entities;
 
 namespace SocNet.Core.EFRepository
 {
-    class ApplicationContext : DbContext
+    public class ApplicationContext : DbContext
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Post> Posts { get; set; }
