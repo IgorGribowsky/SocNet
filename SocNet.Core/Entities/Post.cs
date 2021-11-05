@@ -8,7 +8,7 @@ namespace SocNet.Core.Entities
 {
     public class Post
     {
-        public int Id { get; private set; }
+        public int Id { get; init; }
 
         public string Content { get; set; }
 
