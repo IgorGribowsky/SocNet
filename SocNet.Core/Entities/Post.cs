@@ -14,7 +14,7 @@ namespace SocNet.Core.Entities
 
         public int UserId { get; set; }
 
-        public int ParentPostId { get; set; }
+        public int? ParentPostId { get; set; }
 
         public int LikeCount { get; set; }
 
