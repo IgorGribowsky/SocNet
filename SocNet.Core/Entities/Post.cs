@@ -8,13 +8,13 @@ namespace SocNet.Core.Entities
 {
     public class Post
     {
-        public int Id { get; private set; }
+        public int Id { get; init; }
 
         public string Content { get; set; }
 
         public int UserId { get; set; }
 
-        public int ParentPostId { get; set; }
+        public int? ParentPostId { get; set; }
 
         public int LikeCount { get; set; }
 
