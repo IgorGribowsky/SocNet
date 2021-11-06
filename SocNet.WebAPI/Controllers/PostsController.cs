@@ -7,6 +7,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using SocNet.Core.Entities;
 using SocNet.Services.PostsManaging;
+using SocNet.WebAPI.Models;
+using System.Net.Mime;
 
 namespace SocNet.WebAPI.Controllers
 {
@@ -84,6 +86,32 @@ namespace SocNet.WebAPI.Controllers
             var childrenPosts = await _postManager.GetChildrenAsync(requestedPost.Id);
 
             return Ok(childrenPosts);
+        }
+
+        [HttpPost]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<Post>> CreateAsync([FromBody] InputPostData postData)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var post = new Post { Content = postData.Content, UserId = postData.UserId, ParentPostId = postData.ParentPostId };
+
+            var publishedPost = await _postManager.Create(post);
+
+            return CreatedAtAction(nameof(GetById), new { id = publishedPost.Id }, publishedPost);
+        }
+
+        [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> Delete(int id)
+        {
+            return NoContent();
         }
     }
 }

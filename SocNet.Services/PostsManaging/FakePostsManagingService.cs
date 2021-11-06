@@ -28,8 +28,27 @@ namespace SocNet.Services.PostsManaging
                     ParentPostId = i > 1 ? i - 1 : null, 
                     LikeCount = rand.Next(0, 99),
                     CommentCount = rand.Next(0, 99),
+                    CreationTime = DateTime.Now,
                 });
             }
+        }
+
+        public async Task<Post> Create(Post postData)
+        {
+            var biggestId = _fakePosts.Select(p => p.Id).OrderByDescending(i => i).FirstOrDefault();
+            var isParentValid = _fakePosts.Any(p => p.Id == postData.ParentPostId);
+            var newPost = new Post 
+            { 
+                Id = biggestId + 1, 
+                Content = postData.Content, 
+                ParentPostId = isParentValid ? postData.ParentPostId : null,
+                CreationTime = DateTime.Now,
+                UserId = postData.UserId
+            };
+
+            _fakePosts.Add(newPost);
+
+            return newPost;
         }
 
         public async Task<Post> GetByIdAsync(int id)
