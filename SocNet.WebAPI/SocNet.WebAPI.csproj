@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SocNet.Core\SocNet.Core.csproj" />
+    <ProjectReference Include="..\SocNet.Services\SocNet.Services.csproj" />
   </ItemGroup>
 
 </Project>

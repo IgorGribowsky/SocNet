@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SocNet.Core.Entities;
+using SocNet.Services.PostsManaging;
 
 namespace SocNet.WebAPI.Controllers
 {
@@ -12,24 +14,20 @@ namespace SocNet.WebAPI.Controllers
     [ApiController]
     public class PostsController : ControllerBase
     {
-        private List<Post> _fakePosts;
+        private readonly IPostsManagingService _postManager;
+        private readonly ILogger<PostsController> _logger;
 
-        public PostsController()
+        public PostsController(IPostsManagingService postManager, ILogger<PostsController> logger)
         {
-            int fakePostsNumber = 10;
-            _fakePosts = new List<Post>();
-
-            for (int i = 1; i <= fakePostsNumber; i++)
-            {
-                _fakePosts.Add(new Post { Id = i, Content = $"This is post {i}", ParentPostId = i > 1 ? i - 1 : null });
-            }
+            _postManager = postManager;
+            _logger = logger;
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Post>))]
-        public async Task<ActionResult<List<Post>>> Get()
+        public async Task<ActionResult<List<Post>>> Get([FromQuery] int page = 1, [FromQuery] int page_size = 10)
         {
-            var posts = _fakePosts.Select(p => p);
+            var posts = await _postManager.GetPostsAsync(page: page, pageSize: page_size);
 
             return Ok(posts);
         }
@@ -37,9 +35,9 @@ namespace SocNet.WebAPI.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Post))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Post>> GetPost(int id)
+        public async Task<ActionResult<Post>> GetById(int id)
         {
-            var requestedPost = _fakePosts.FirstOrDefault(p => p.Id == id);
+            var requestedPost = await _postManager.GetByIdAsync(id);
 
             if (requestedPost is null)
             {
@@ -54,7 +52,7 @@ namespace SocNet.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Post>> GetParent(int id)
         {
-            var requestedPost = _fakePosts.FirstOrDefault(p => p.Id == id);
+            var requestedPost = await _postManager.GetByIdAsync(id);
 
             if (requestedPost is null)
             {
@@ -66,7 +64,7 @@ namespace SocNet.WebAPI.Controllers
                 return Ok(null);
             }
 
-            var parentPost = _fakePosts.FirstOrDefault(p => p.Id == (int)requestedPost.ParentPostId);
+            var parentPost = await _postManager.GetByIdAsync((int)requestedPost.ParentPostId);
 
             return Ok(parentPost); // even if it is null!
         }
@@ -76,14 +74,14 @@ namespace SocNet.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<List<Post>>> GetChildren(int id)
         {
-            var requestedPost =  _fakePosts.FirstOrDefault(p => p.Id == id);
+            var requestedPost = await _postManager.GetByIdAsync(id);
 
             if (requestedPost is null)
             {
                 return NotFound();
             }
 
-            var childrenPosts = _fakePosts.Where(p => p.ParentPostId == requestedPost.Id).Select(p => p);
+            var childrenPosts = await _postManager.GetChildrenAsync(requestedPost.Id);
 
             return Ok(childrenPosts);
         }
