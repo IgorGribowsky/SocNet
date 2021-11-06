@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SocNet.WebAPI", "SocNet.WebAPI\SocNet.WebAPI.csproj", "{5C381961-A857-4A9F-A1A7-A6A7E8A1759D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocNet.Core", "SocNet.Core\SocNet.Core.csproj", "{A4EB0F9E-6C15-4579-A55C-02211F1B4755}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SocNet.Core", "SocNet.Core\SocNet.Core.csproj", "{A4EB0F9E-6C15-4579-A55C-02211F1B4755}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocNet.Services", "SocNet.Services\SocNet.Services.csproj", "{3EFDE206-C6BD-427C-90F5-CEF3BFA1C939}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{A4EB0F9E-6C15-4579-A55C-02211F1B4755}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A4EB0F9E-6C15-4579-A55C-02211F1B4755}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A4EB0F9E-6C15-4579-A55C-02211F1B4755}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EFDE206-C6BD-427C-90F5-CEF3BFA1C939}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EFDE206-C6BD-427C-90F5-CEF3BFA1C939}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EFDE206-C6BD-427C-90F5-CEF3BFA1C939}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EFDE206-C6BD-427C-90F5-CEF3BFA1C939}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
