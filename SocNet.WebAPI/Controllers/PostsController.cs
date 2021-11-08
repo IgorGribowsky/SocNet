@@ -101,16 +101,25 @@ namespace SocNet.WebAPI.Controllers
 
             var post = new Post { Content = postData.Content, UserId = postData.UserId, ParentPostId = postData.ParentPostId };
 
-            var publishedPost = await _postManager.Create(post);
+            var publishedPost = await _postManager.CreateAsync(post);
 
             return CreatedAtAction(nameof(GetById), new { id = publishedPost.Id }, publishedPost);
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> Delete(int id)
         {
+            var targetPost = await _postManager.GetByIdAsync(id);
+
+            if (targetPost is null)
+            {
+                return NotFound();
+            }
+
+            await _postManager.DeleteByIdAsync(id);
+
             return NoContent();
         }
     }

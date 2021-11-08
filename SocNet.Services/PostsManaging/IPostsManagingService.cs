@@ -15,6 +15,8 @@ namespace SocNet.Services.PostsManaging
 
         public Task<IEnumerable<Post>> GetPostsAsync(int page, int pageSize);
 
-        public Task<Post> Create(Post post);
+        public Task<Post> CreateAsync(Post post);
+
+        public Task DeleteByIdAsync(int id);
     }
 }

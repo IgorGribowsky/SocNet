@@ -33,7 +33,7 @@ namespace SocNet.Services.PostsManaging
             }
         }
 
-        public async Task<Post> Create(Post postData)
+        public async Task<Post> CreateAsync(Post postData)
         {
             var biggestId = _fakePosts.Select(p => p.Id).OrderByDescending(i => i).FirstOrDefault();
             var isParentValid = _fakePosts.Any(p => p.Id == postData.ParentPostId);
@@ -72,6 +72,15 @@ namespace SocNet.Services.PostsManaging
             var posts = _fakePosts.Select(p => p).Skip(skippedPosts).Take(pageSize);
 
             return posts;
+        }
+
+        public async Task DeleteByIdAsync(int id)
+        {
+            var post = await GetByIdAsync(id);
+
+            _fakePosts.Remove(post);
+
+            return;
         }
     }
 }
