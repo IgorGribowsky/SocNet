@@ -35,8 +35,8 @@ namespace SocNet.Services.PostsManaging
 
         public async Task<Post> CreateAsync(Post postData)
         {
-            var biggestId = _fakePosts.Select(p => p.Id).OrderByDescending(i => i).FirstOrDefault();
-            var isParentValid = _fakePosts.Any(p => p.Id == postData.ParentPostId);
+            var biggestId = await Task.Run(() => _fakePosts.Select(p => p.Id).OrderByDescending(i => i).FirstOrDefault());
+            var isParentValid = await Task.Run(() => _fakePosts.Any(p => p.Id == postData.ParentPostId));
             var newPost = new Post 
             { 
                 Id = biggestId + 1, 
@@ -46,21 +46,21 @@ namespace SocNet.Services.PostsManaging
                 UserId = postData.UserId
             };
 
-            _fakePosts.Add(newPost);
+            await Task.Run(() => _fakePosts.Add(newPost));
 
             return newPost;
         }
 
         public async Task<Post> GetByIdAsync(int id)
         {
-            var requestedPost = _fakePosts.FirstOrDefault(p => p.Id == id);
+            var requestedPost = await Task.Run(() => _fakePosts.FirstOrDefault(p => p.Id == id));
 
             return requestedPost;
         }
 
         public async Task<IEnumerable<Post>> GetChildrenAsync(int id)
         {
-            var childrenPosts = _fakePosts.Where(p => p.ParentPostId == id).Select(p => p);
+            var childrenPosts = await Task.Run(() => _fakePosts.Where(p => p.ParentPostId == id).Select(p => p));
 
             return childrenPosts;
         }
@@ -69,7 +69,7 @@ namespace SocNet.Services.PostsManaging
         {
             var skippedPosts = (page - 1) * pageSize;
 
-            var posts = _fakePosts.Select(p => p).Skip(skippedPosts).Take(pageSize);
+            var posts = await Task.Run(() => _fakePosts.Select(p => p).Skip(skippedPosts).Take(pageSize));
 
             return posts;
         }
@@ -77,7 +77,7 @@ namespace SocNet.Services.PostsManaging
         {
             var skippedPosts = (page - 1) * pageSize;
 
-            var posts = _fakePosts.Where(p => p.UserId == id).Select(p => p).Skip(skippedPosts).Take(pageSize);
+            var posts = await Task.Run(() => _fakePosts.Where(p => p.UserId == id).Select(p => p).Skip(skippedPosts).Take(pageSize));
 
             return posts;
         }

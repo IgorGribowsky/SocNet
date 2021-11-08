@@ -24,7 +24,7 @@ namespace SocNet.Services.UsersManaging
 
         public async Task<User> GetByIdAsync(int id)
         {
-            var requestedUser = _fakeUsers.FirstOrDefault(u => u.Id == id);
+            var requestedUser = await Task.Run(() => _fakeUsers.FirstOrDefault(u => u.Id == id));
 
             return requestedUser;
         }
@@ -33,7 +33,7 @@ namespace SocNet.Services.UsersManaging
         {
             var skippedUsers = (page - 1) * pageSize;
 
-            var users = _fakeUsers.Skip(skippedUsers).Take(pageSize);
+            var users = await Task.Run(() => _fakeUsers.Skip(skippedUsers).Take(pageSize));
 
             return users;
         }
