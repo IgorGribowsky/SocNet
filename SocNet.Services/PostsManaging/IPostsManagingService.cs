@@ -14,6 +14,8 @@ namespace SocNet.Services.PostsManaging
         public Task<IEnumerable<Post>> GetChildrenAsync(int id);
 
         public Task<IEnumerable<Post>> GetPostsAsync(int page, int pageSize);
+        
+        public Task<IEnumerable<Post>> GetPostsByUserIdAsync(int id, int page, int pageSize);
 
         public Task<Post> CreateAsync(Post post);
 

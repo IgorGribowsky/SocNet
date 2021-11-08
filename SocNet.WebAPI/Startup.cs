@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SocNet.Services.PostsManaging;
+using SocNet.Services.UsersManaging;
 
 namespace SocNet.WebAPI
 {
@@ -28,6 +29,7 @@ namespace SocNet.WebAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IPostsManagingService, FakePostsManagingService>();
+            services.AddSingleton<IUsersManagingService, FakeUsersManagingService>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

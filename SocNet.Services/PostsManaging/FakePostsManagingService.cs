@@ -19,7 +19,7 @@ namespace SocNet.Services.PostsManaging
 
             for (int i = 1; i <= fakePostsNumber; i++)
             {
-                var userId = rand.Next(0, 99);
+                var userId = rand.Next(1, 4);
                 _fakePosts.Add(new Post 
                 { 
                     Id = i, 
@@ -70,6 +70,14 @@ namespace SocNet.Services.PostsManaging
             var skippedPosts = (page - 1) * pageSize;
 
             var posts = _fakePosts.Select(p => p).Skip(skippedPosts).Take(pageSize);
+
+            return posts;
+        }
+        public async Task<IEnumerable<Post>> GetPostsByUserIdAsync(int id, int page = 1, int pageSize = 10)
+        {
+            var skippedPosts = (page - 1) * pageSize;
+
+            var posts = _fakePosts.Where(p => p.UserId == id).Select(p => p).Skip(skippedPosts).Take(pageSize);
 
             return posts;
         }
