@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SocNet.Core\SocNet.Core.csproj" />
-    <ProjectReference Include="..\SocNet.Infrastructure\SocNet.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

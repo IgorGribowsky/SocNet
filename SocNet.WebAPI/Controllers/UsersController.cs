@@ -67,7 +67,7 @@ namespace SocNet.WebAPI.Controllers
         [HttpGet("{id}/feed")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Post>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<Post>>> GetFeed([FromRoute] int id)
+        public async Task<ActionResult<List<Post>>> GetFeed([FromRoute] int id, [FromQuery] int page = 1, [FromQuery] int page_size = 10)
         {
             var requestedUser = await _usersManager.GetByIdAsync(id);
 
