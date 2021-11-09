@@ -61,19 +61,6 @@ namespace SocNet.WebAPI
                     throw new Exception("DB_TYPE env var not recognized");
             }
 
-            if (dbType == "POSTGRE")
-            {
-                services.AddEntityFrameworkNpgsql()
-                    .AddDbContext<ApplicationContext>
-                    (options => 
-                    options.UseNpgsql(connectionString));
-            }
-            else
-            {
-
-            }
-            
-
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SocNet.WebAPI", Version = "v1" });
