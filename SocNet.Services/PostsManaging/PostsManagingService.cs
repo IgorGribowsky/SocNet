@@ -19,6 +19,7 @@ namespace SocNet.Services.PostsManaging
 
         public async Task<Post> CreateAsync(Post post)
         {
+            post.CreationTime = DateTime.Now;
             var createdPost = await _repository.CreateAsync<Post>(post);
 
             return createdPost;
