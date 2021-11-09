@@ -90,5 +90,10 @@ namespace SocNet.Services.PostsManaging
 
             return;
         }
+
+        public async Task<IEnumerable<Post>> GetFeedByUserIdAsync(int id, int page, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

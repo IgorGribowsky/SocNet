@@ -63,5 +63,22 @@ namespace SocNet.WebAPI.Controllers
 
             return Ok(posts);
         }
+
+        [HttpGet("{id}/feed")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Post>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<Post>>> GetFeed([FromRoute] int id)
+        {
+            var requestedUser = await _usersManager.GetByIdAsync(id);
+
+            if (requestedUser is null)
+            {
+                return NotFound();
+            }
+
+            var posts = await _postsManager.GetFeedByUserIdAsync(id: id, page: page, pageSize: page_size);
+
+            return Ok(posts);
+        }
     }
 }
