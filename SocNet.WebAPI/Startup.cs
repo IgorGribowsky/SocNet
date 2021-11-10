@@ -11,7 +11,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 using SocNet.Services.PostsManaging;
+using SocNet.Services.UsersManaging;
+using SocNet.Infrastructure.EFRepository;
+using SocNet.Infrastructure.Interfaces;
 
 namespace SocNet.WebAPI
 {
@@ -27,8 +32,35 @@ namespace SocNet.WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<IPostsManagingService, FakePostsManagingService>();
+            //services.AddSingleton<IPostsManagingService, FakePostsManagingService>();
+            //services.AddSingleton<IUsersManagingService, FakeUsersManagingService>();
+
+            services.AddTransient<IPostsManagingService, PostsManagingService>();
+            services.AddTransient<IUsersManagingService, UsersManagingService>();
+
+            services.AddTransient<IRepository, Repository>();
             services.AddControllers();
+
+            var dbType = Environment.GetEnvironmentVariable("DB_TYPE");
+            var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+
+            switch (dbType)
+            {
+                case "MSSQL":
+                    services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connectionString));
+                    break;
+
+                case "POSTGRE":
+                    services.AddEntityFrameworkNpgsql()
+                    .AddDbContext<ApplicationContext>
+                    (options =>
+                    options.UseNpgsql(connectionString));
+                    break;
+
+                default:
+                    throw new Exception("DB_TYPE env var not recognized");
+            }
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SocNet.WebAPI", Version = "v1" });

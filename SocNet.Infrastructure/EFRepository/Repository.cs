@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using SocNet.Core.Interfaces;
+using SocNet.Infrastructure.Interfaces;
 
-namespace SocNet.Core.EFRepository
+namespace SocNet.Infrastructure.EFRepository
 {
     public class Repository : IRepository
     {
@@ -17,15 +17,27 @@ namespace SocNet.Core.EFRepository
             _context = context;
         }
 
-        public void Create<TEntity>(TEntity entity) where TEntity : class
+        public TEntity Create<TEntity>(TEntity entity) where TEntity : class
         {
             var _dbSet = _context.Set<TEntity>();
 
-            _dbSet.Add(entity);
+            var entityEntry = _dbSet.Add(entity);
             _context.SaveChanges();
+
+            return entityEntry.Entity;
         }
 
-        public void Delete<TEntity>(int id) where TEntity : class
+        public async Task<TEntity> CreateAsync<TEntity>(TEntity entity) where TEntity : class
+        {
+            var _dbSet = _context.Set<TEntity>();
+
+            var entityEntry = _dbSet.Add(entity);
+            await _context.SaveChangesAsync();
+
+            return entityEntry.Entity;
+        }
+
+        public void DeleteById<TEntity>(int id) where TEntity : class
         {
             var _dbSet = _context.Set<TEntity>();
 
@@ -35,11 +47,28 @@ namespace SocNet.Core.EFRepository
             _context.SaveChanges();
         }
 
+        public async Task DeleteByIdAsync<TEntity>(int id) where TEntity : class
+        {
+            var _dbSet = _context.Set<TEntity>();
+
+            var item = _dbSet.Find(id);
+
+            _dbSet.Remove(item);
+            await _context.SaveChangesAsync();
+        }
+
         public IList<TEntity> GetAll<TEntity>() where TEntity : class
         {
             var _dbSet = _context.Set<TEntity>();
 
             return _dbSet.ToList();
+        }
+
+        public async Task<IList<TEntity>> GetAllAsync<TEntity>() where TEntity : class
+        {
+            var _dbSet = _context.Set<TEntity>();
+
+            return await _dbSet.ToListAsync();
         }
 
         public TEntity GetById<TEntity>(int id) where TEntity : class
@@ -63,6 +92,15 @@ namespace SocNet.Core.EFRepository
             _dbSet.Attach(entity);
             _context.Entry(entity).State = EntityState.Modified;
             _context.SaveChanges();
+        }
+
+        public async Task UpdateAsync<TEntity>(TEntity entity) where TEntity : class
+        {
+            var _dbSet = _context.Set<TEntity>();
+
+            _dbSet.Attach(entity);
+            _context.Entry(entity).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
         }
     }
 }
