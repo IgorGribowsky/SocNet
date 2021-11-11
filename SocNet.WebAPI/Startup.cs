@@ -42,7 +42,12 @@ namespace SocNet.WebAPI
             services.AddControllers();
 
             var dbType = Environment.GetEnvironmentVariable("DB_TYPE");
+            if (string.IsNullOrEmpty(dbType))
+                throw new Exception("Can't find DB_TYPE env var");
+
             var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+            if (string.IsNullOrEmpty(connectionString))
+                throw new Exception("Can't find CONNECTION_STRING env var");
 
             switch (dbType)
             {
