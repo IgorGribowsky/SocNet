@@ -17,6 +17,7 @@ using SocNet.Services.PostsManaging;
 using SocNet.Services.UsersManaging;
 using SocNet.Infrastructure.EFRepository;
 using SocNet.Infrastructure.Interfaces;
+using SocNet.Services.AuthenticationManaging;
 
 namespace SocNet.WebAPI
 {
@@ -37,6 +38,9 @@ namespace SocNet.WebAPI
 
             services.AddTransient<IPostsManagingService, PostsManagingService>();
             services.AddTransient<IUsersManagingService, UsersManagingService>();
+
+            services.AddTransient<IUserValidationService, UserValidatorMonolithic>();
+            services.AddTransient<IJwtManagingService, JwtManagingService>();
 
             services.AddTransient<IRepository, Repository>();
             services.AddControllers();
