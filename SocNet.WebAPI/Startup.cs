@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -18,6 +19,7 @@ using SocNet.Services.UsersManaging;
 using SocNet.Infrastructure.EFRepository;
 using SocNet.Infrastructure.Interfaces;
 using SocNet.Services.AuthenticationManaging;
+using SocNet.Core.Entities;
 
 namespace SocNet.WebAPI
 {
@@ -33,14 +35,13 @@ namespace SocNet.WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddSingleton<IPostsManagingService, FakePostsManagingService>();
-            //services.AddSingleton<IUsersManagingService, FakeUsersManagingService>();
-
             services.AddTransient<IPostsManagingService, PostsManagingService>();
             services.AddTransient<IUsersManagingService, UsersManagingService>();
 
-            services.AddTransient<IUserValidationService, UserValidatorMonolithic>();
+            services.AddTransient<IAuthenticationService, AuthenticationMonoliticService>();
             services.AddTransient<IJwtManagingService, JwtManagingService>();
+
+            services.AddTransient<IPasswordHasher<UserIdentity>, PasswordHasher<UserIdentity>>();
 
             services.AddTransient<IRepository, Repository>();
             services.AddControllers();
