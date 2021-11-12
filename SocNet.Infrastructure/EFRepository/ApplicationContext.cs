@@ -47,9 +47,9 @@ namespace SocNet.Infrastructure.EFRepository
             modelBuilder.Entity<UserIdentity>().HasData(
                 new UserIdentity[]
                 {
-                    new UserIdentity {Id = 1, UserId = 1, UserName = "grias", Password = "123123"},
-                    new UserIdentity {Id = 2, UserId = 2, UserName = "ppa", Password = "123123"},
-                    new UserIdentity {Id = 3, UserId = 3, UserName = "lupa", Password = "123123"}
+                    new UserIdentity {Id = 1, UserId = 1, UserName = "grias", Password = "123"},
+                    new UserIdentity {Id = 2, UserId = 2, UserName = "ppa", Password = "123"},
+                    new UserIdentity {Id = 3, UserId = 3, UserName = "lupa", Password = "123"}
                 });
         }
     }
