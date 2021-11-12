@@ -15,6 +15,7 @@ namespace SocNet.Infrastructure.EFRepository
         public DbSet<Repost> Reposts { get; set; }
         public DbSet<Like> Likes { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
+        public DbSet<UserIdentity> UserIdentities { get; set; }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
@@ -41,6 +42,14 @@ namespace SocNet.Infrastructure.EFRepository
                     new User {Id = 1, FirstName = "Alex", SecondName = "Gribowski"},
                     new User {Id = 2, FirstName = "Pupa", SecondName = "Gribowski"},
                     new User {Id = 3, FirstName = "Lupa", SecondName = "Gribowski"}
+                });
+
+            modelBuilder.Entity<UserIdentity>().HasData(
+                new UserIdentity[]
+                {
+                    new UserIdentity {Id = 1, UserId = 1, UserName = "grias", Password = "123"},
+                    new UserIdentity {Id = 2, UserId = 2, UserName = "ppa", Password = "123"},
+                    new UserIdentity {Id = 3, UserId = 3, UserName = "lupa", Password = "123"}
                 });
         }
     }
