@@ -29,8 +29,15 @@ namespace SocNet.Services.AuthenticationManaging
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[] { new Claim("id", user.Id.ToString()) }),
-                Expires = DateTime.UtcNow.AddDays(1),
+                Issuer = "Issuer",
+                Audience = "Audience",
+                NotBefore = DateTime.UtcNow,
+                Subject = new ClaimsIdentity(
+                    new[] { 
+                        new Claim("Id", user.Id.ToString()),
+                        new Claim("UserId", user.UserId.ToString())
+                    }),
+                Expires = DateTime.UtcNow.AddMinutes(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 

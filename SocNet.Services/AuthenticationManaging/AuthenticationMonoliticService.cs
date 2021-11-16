@@ -13,7 +13,7 @@ namespace SocNet.Services.AuthenticationManaging
 
     public record SignupDto(string Username, string Password, string FirstName, string LastName);
 
-    public class AuthenticationMonoliticService : IAuthenticationService
+    public class AuthenticationMonoliticService : ICustomAuthenticationService
     {
         private readonly IJwtManagingService _jwtManager;
         private readonly IRepository _repository;

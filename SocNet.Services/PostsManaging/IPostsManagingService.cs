@@ -22,5 +22,7 @@ namespace SocNet.Services.PostsManaging
         public Task<Post> CreateAsync(Post post);
 
         public Task DeleteByIdAsync(int id);
+
+        public Task<bool> ValidatePostDataAsync(Post post);
     }
 }
