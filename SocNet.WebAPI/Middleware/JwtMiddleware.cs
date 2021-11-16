@@ -15,7 +15,7 @@ namespace SocNet.WebAPI.Middleware
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context, IJwtManagingService jwtManager, IAuthenticationService validationService)
+        public async Task Invoke(HttpContext context, IJwtManagingService jwtManager, ICustomAuthenticationService validationService)
         {
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
             var userId = await validationService.ValidateJwtAsync(token);

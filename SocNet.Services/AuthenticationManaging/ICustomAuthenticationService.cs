@@ -7,7 +7,7 @@ using SocNet.Core.Entities;
 
 namespace SocNet.Services.AuthenticationManaging
 {
-    public interface IAuthenticationService
+    public interface ICustomAuthenticationService
     {
         public Task<int?> ValidateJwtAsync(string token);
 

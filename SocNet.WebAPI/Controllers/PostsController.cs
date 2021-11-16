@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ namespace SocNet.WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class PostsController : ControllerBase
     {
         private readonly IPostsManagingService _postManager;
@@ -26,6 +28,7 @@ namespace SocNet.WebAPI.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Post>))]
         public async Task<ActionResult<List<Post>>> Get([FromQuery] int page = 1, [FromQuery] int page_size = 10)
         {
@@ -35,6 +38,7 @@ namespace SocNet.WebAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Post))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Post>> GetById(int id)
@@ -43,13 +47,14 @@ namespace SocNet.WebAPI.Controllers
 
             if (requestedPost is null)
             {
-                return NotFound();
+                return NotFound(new { message = "PPost doesn't exist" });
             }
 
             return Ok(requestedPost);
         }
 
         [HttpGet("{id}/parent")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Post))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Post>> GetParent(int id)
@@ -58,7 +63,7 @@ namespace SocNet.WebAPI.Controllers
 
             if (requestedPost is null)
             {
-                return NotFound();
+                return NotFound(new { message = "Can't provide parent of nonexistent post" });
             }
 
             if (requestedPost.ParentPostId is null)
@@ -72,6 +77,7 @@ namespace SocNet.WebAPI.Controllers
         }
 
         [HttpGet("{id}/children")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Post>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<List<Post>>> GetChildren(int id)
@@ -80,7 +86,7 @@ namespace SocNet.WebAPI.Controllers
 
             if (requestedPost is null)
             {
-                return NotFound();
+                return NotFound(new { message = "Can't provide children of nonexistent post" });
             }
 
             var childrenPosts = await _postManager.GetChildrenAsync(requestedPost.Id);
@@ -92,14 +98,26 @@ namespace SocNet.WebAPI.Controllers
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<Post>> CreateAsync([FromBody] InputPostData postData)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
 
-            var post = new Post { Content = postData.Content, UserId = postData.UserId, ParentPostId = postData.ParentPostId };
+            var userIdStr = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId").Value;
+            if (userIdStr is null || !int.TryParse(userIdStr, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var post = new Post { Content = postData.Content, UserId = userId, ParentPostId = postData.ParentPostId };
+
+            if (!await _postManager.ValidatePostDataAsync(post))
+            {
+                return BadRequest();
+            }
 
             var publishedPost = await _postManager.CreateAsync(post);
 
@@ -109,13 +127,25 @@ namespace SocNet.WebAPI.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult> Delete(int id)
         {
+            var userIdStr = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId").Value;
+            if (userIdStr is null || !int.TryParse(userIdStr, out var userId))
+            {
+                return Unauthorized();
+            }
+
             var targetPost = await _postManager.GetByIdAsync(id);
 
             if (targetPost is null)
             {
-                return NotFound();
+                return NotFound(new { message = "Post you are trying to delete doesn't exist" });
+            }
+
+            if (targetPost.UserId != userId)
+            {
+                return Unauthorized(new { message = "You don't have rights to delete this post"});
             }
 
             await _postManager.DeleteByIdAsync(id);
