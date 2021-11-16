@@ -95,5 +95,10 @@ namespace SocNet.Services.PostsManaging
         {
             throw new NotImplementedException();
         }
+
+        public Task<bool> ValidatePostDataAsync(Post post)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
