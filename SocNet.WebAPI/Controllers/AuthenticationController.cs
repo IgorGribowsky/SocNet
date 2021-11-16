@@ -48,7 +48,7 @@ namespace SocNet.WebAPI.Controllers
 
             if (!isUsernameUnique)
             {
-                return BadRequest(new { message = $"Username \"{signupData.Username}\" already taken" });
+                return BadRequest(new { message = "Username already taken" });
             }
 
             var user = await _authService.SignUpAsync(
@@ -59,9 +59,12 @@ namespace SocNet.WebAPI.Controllers
                             LastName: signupData.LastName
                         ));
 
-            var userData = new AuthenticationSuccessModel { UserId = user.UserId, Username = user.UserName };
+            AddAuthorizationHeader(user);
 
-            return CreatedAtAction(nameof(SignUp), new { id = userData.UserId }, userData);
+            return CreatedAtAction(nameof(SignUp), new { id = user.UserId }, 
+                new AuthenticationSuccessModel { 
+                    UserId = user.UserId, Username = user.UserName 
+                });
         }
 
         [HttpPost("signin")]
@@ -80,8 +83,7 @@ namespace SocNet.WebAPI.Controllers
             {
                 return BadRequest(new { message = "Incorrect username or password" });
             }
-            var token = _jwtManager.CreateToken(user);
-            HttpContext.Response.Headers.Add("Authorization", token);
+            AddAuthorizationHeader(user);
 
             return Ok(new AuthenticationSuccessModel
             {
@@ -109,6 +111,11 @@ namespace SocNet.WebAPI.Controllers
             }
 
             return Ok(id);
+        }
+        private void AddAuthorizationHeader(UserIdentity user)
+        {
+            var token = "Bearer " + _jwtManager.CreateToken(user);
+            HttpContext.Response.Headers.Add("Authorization", token);
         }
     }
 }
