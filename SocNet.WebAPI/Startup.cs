@@ -23,6 +23,7 @@ using SocNet.Infrastructure.EFRepository;
 using SocNet.Infrastructure.Interfaces;
 using SocNet.Services.AuthenticationManaging;
 using SocNet.Core.Entities;
+using SocNet.WebAPI.StartupExtensionMethods;
 
 namespace SocNet.WebAPI
 {
@@ -50,7 +51,7 @@ namespace SocNet.WebAPI
             services.AddControllers();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer( options =>
+                .AddJwtBearer(options =>
                 {
                     options.RequireHttpsMetadata = false;
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -65,30 +66,7 @@ namespace SocNet.WebAPI
 
                 });
 
-            var dbType = Environment.GetEnvironmentVariable("DB_TYPE");
-            if (string.IsNullOrEmpty(dbType))
-                throw new Exception("Can't find DB_TYPE env var");
-
-            var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
-            if (string.IsNullOrEmpty(connectionString))
-                throw new Exception("Can't find CONNECTION_STRING env var");
-
-            switch (dbType)
-            {
-                case "MSSQL":
-                    services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connectionString));
-                    break;
-
-                case "POSTGRE":
-                    services.AddEntityFrameworkNpgsql()
-                    .AddDbContext<ApplicationContext>
-                    (options =>
-                    options.UseNpgsql(connectionString));
-                    break;
-
-                default:
-                    throw new Exception("DB_TYPE env var not recognized");
-            }
+            services.AddDbContextBasedOnDbTypeEnvVar();
 
             services.AddSwaggerGen(c =>
             {

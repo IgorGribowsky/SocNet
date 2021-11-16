@@ -69,5 +69,18 @@ namespace SocNet.Services.PostsManaging
 
             return posts;
         }
+
+        public async Task<bool> ValidatePostDataAsync(Post post)
+        {
+            if (post.ParentPostId is not null)
+            {
+                var parentPost = await GetByIdAsync((int)post.ParentPostId);
+
+                if (parentPost is null)
+                    return false;
+            }
+
+            return true;
+        }
     }
 }
