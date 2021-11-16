@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -8,7 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,13 +41,29 @@ namespace SocNet.WebAPI
             services.AddTransient<IPostsManagingService, PostsManagingService>();
             services.AddTransient<IUsersManagingService, UsersManagingService>();
 
-            services.AddTransient<IAuthenticationService, AuthenticationMonoliticService>();
+            services.AddTransient<ICustomAuthenticationService, AuthenticationMonoliticService>();
             services.AddTransient<IJwtManagingService, JwtManagingService>();
 
             services.AddTransient<IPasswordHasher<UserIdentity>, PasswordHasher<UserIdentity>>();
 
             services.AddTransient<IRepository, Repository>();
             services.AddControllers();
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer( options =>
+                {
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = "Issuer",
+                        ValidateAudience = true,
+                        ValidAudience = "Audience",
+                        ValidateLifetime = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET")))
+                    };
+
+                });
 
             var dbType = Environment.GetEnvironmentVariable("DB_TYPE");
             if (string.IsNullOrEmpty(dbType))
@@ -91,6 +110,7 @@ namespace SocNet.WebAPI
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

@@ -22,12 +22,12 @@ namespace SocNet.WebAPI.Controllers
 
         private readonly IJwtManagingService _jwtManager;
 
-        private readonly IAuthenticationService _authService;
+        private readonly ICustomAuthenticationService _authService;
 
         public AuthenticationController(
             ILogger<AuthenticationController> logger,
             IJwtManagingService jwtManager,
-            IAuthenticationService userValidator)
+            ICustomAuthenticationService userValidator)
         {
             _logger = logger;
             _jwtManager = jwtManager;
