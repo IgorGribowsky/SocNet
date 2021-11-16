@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ using SocNet.Services.PostsManaging;
 namespace SocNet.WebAPI.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -24,6 +26,7 @@ namespace SocNet.WebAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(User))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<User>> GetById(int id)
@@ -39,6 +42,7 @@ namespace SocNet.WebAPI.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<User>))]
         public async Task<ActionResult<List<User>>> Get([FromQuery] int page = 1, [FromQuery] int page_size = 5)
         {
@@ -48,6 +52,7 @@ namespace SocNet.WebAPI.Controllers
         }
 
         [HttpGet("{id}/posts")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Post>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<List<Post>>> GetPostsByUserId([FromRoute] int id, [FromQuery] int page = 1, [FromQuery] int page_size = 10)
