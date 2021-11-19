@@ -144,7 +144,7 @@ namespace SocNet.WebAPI.Controllers
                 return NotFound(new { message = "User doesn't exist" });
             }
 
-            var isSubscriptionExists = await _subscriptionManager.CheckSubscribtionExistance(subscriberUserId: subscriberId, targetUserId: targetUser.Id);
+            var isSubscriptionExists = await _subscriptionManager.CheckSubscriptionExistance(subscriberUserId: subscriberId, targetUserId: targetUser.Id);
             if (isSubscriptionExists)
             {
                 return BadRequest(new { message = "You already subscribed to this user"});

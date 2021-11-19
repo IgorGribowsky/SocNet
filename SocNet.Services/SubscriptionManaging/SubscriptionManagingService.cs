@@ -17,7 +17,7 @@ namespace SocNet.Services.SubscriptionManaging
             _repository = repository;
         }
 
-        public async Task<bool> CheckSubscribtionExistance(int subscriberUserId, int targetUserId)
+        public async Task<bool> CheckSubscriptionExistance(int subscriberUserId, int targetUserId)
         {
             return await Task.Run(() => 
                 _repository.Query<Subscription>().Any(s => s.SubscriberUserId == subscriberUserId && s.TargetUserId == targetUserId)
