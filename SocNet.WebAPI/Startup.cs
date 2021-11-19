@@ -22,6 +22,7 @@ using SocNet.Services.UsersManaging;
 using SocNet.Infrastructure.EFRepository;
 using SocNet.Infrastructure.Interfaces;
 using SocNet.Services.AuthenticationManaging;
+using SocNet.Services.SubscriptionManaging;
 using SocNet.Core.Entities;
 using SocNet.WebAPI.StartupExtensionMethods;
 
@@ -46,6 +47,8 @@ namespace SocNet.WebAPI
             services.AddTransient<IJwtManagingService, JwtManagingService>();
 
             services.AddTransient<IPasswordHasher<UserIdentity>, PasswordHasher<UserIdentity>>();
+
+            services.AddTransient<ISubscriptionManagingService, SubscriptionManagingService>();
 
             services.AddTransient<IRepository, Repository>();
             services.AddControllers();

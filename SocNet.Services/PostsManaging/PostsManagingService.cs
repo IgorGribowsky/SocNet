@@ -4,17 +4,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using SocNet.Infrastructure.Interfaces;
+using SocNet.Services.SubscriptionManaging;
 
 namespace SocNet.Services.PostsManaging
 {
     public class PostsManagingService : IPostsManagingService
     {
         private readonly IRepository _repository;
+        private readonly ISubscriptionManagingService _subscriptionManager;
 
-        public PostsManagingService(IRepository repository)
+
+        public PostsManagingService(IRepository repository, ISubscriptionManagingService subscriptionManager)
         {
             _repository = repository;
+            _subscriptionManager = subscriptionManager;
         }
 
         public async Task<Post> CreateAsync(Post post)
@@ -45,9 +50,14 @@ namespace SocNet.Services.PostsManaging
             return childrenPosts;
         }
 
-        public Task<IEnumerable<Post>> GetFeedByUserIdAsync(int id, int page, int pageSize)
+        public async Task<IEnumerable<Post>> GetFeedByUserIdAsync(int id, int page, int pageSize)
         {
-            throw new NotImplementedException();
+            var skippedPosts = (page - 1) * pageSize;
+
+            var subsIds = (await _subscriptionManager.GetSubscriptionsByUserIdAsync(id)).Select(u => u.Id);
+            var posts = await _repository.Query<Post>().Where(p => subsIds.Contains(p.UserId))
+                .OrderByDescending(p=>p.CreationTime).Skip(skippedPosts).Take(pageSize).ToListAsync();
+            return posts;
         }
 
         public async Task<IEnumerable<Post>> GetPostsAsync(int page = 1, int pageSize = 10)
