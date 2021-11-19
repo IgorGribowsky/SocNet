@@ -32,16 +32,15 @@ namespace SocNet.Infrastructure.EFRepository
                 {
                     new Post {Id = 1, Content = "Post 1", UserId = 1, CreationTime = DateTime.Now},
                     new Post {Id = 2, Content = "Post 2", UserId = 2, CreationTime = DateTime.Now},
-                    new Post {Id = 3, Content = "Post 3", UserId = 3, CreationTime = DateTime.Now},
-                    new Post {Id = 4, Content = "Post 4", UserId = 4, CreationTime = DateTime.Now}
+                    new Post {Id = 3, Content = "Post 3", UserId = 3, CreationTime = DateTime.Now}
                 });
 
             modelBuilder.Entity<User>().HasData(
                 new User[]
                 {
                     new User {Id = 1, FirstName = "Alex", SecondName = "Gribowski"},
-                    new User {Id = 2, FirstName = "Pupa", SecondName = "Gribowski"},
-                    new User {Id = 3, FirstName = "Lupa", SecondName = "Gribowski"}
+                    new User {Id = 2, FirstName = "Pupa", SecondName = "Dupa"},
+                    new User {Id = 3, FirstName = "Lupa", SecondName = "Zupa"}
                 });
 
             modelBuilder.Entity<UserIdentity>().HasData(
@@ -50,6 +49,14 @@ namespace SocNet.Infrastructure.EFRepository
                     new UserIdentity {Id = 1, UserId = 1, UserName = "grias", Password = "123"},
                     new UserIdentity {Id = 2, UserId = 2, UserName = "ppa", Password = "123"},
                     new UserIdentity {Id = 3, UserId = 3, UserName = "lupa", Password = "123"}
+                });
+
+            modelBuilder.Entity<Subscription>().HasData(
+                new Subscription[]
+                {
+                    new Subscription {SubscriberUserId = 1, TargetUserId = 2},
+                    new Subscription {SubscriberUserId = 1, TargetUserId = 3},
+                    new Subscription {SubscriberUserId = 3, TargetUserId = 1}
                 });
         }
     }

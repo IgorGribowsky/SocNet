@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SocNet.Infrastructure.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace SocNet.Services.UsersManaging
 {
@@ -27,7 +28,7 @@ namespace SocNet.Services.UsersManaging
         {
             var skippedUsers = (page - 1) * pageSize;
 
-            var users = await Task.Run(() => _repository.Query<User>().OrderBy(u=>u.Id).Skip(skippedUsers).Take(pageSize));
+            var users = await _repository.Query<User>().OrderBy(u=>u.Id).Skip(skippedUsers).Take(pageSize).ToListAsync();
 
             return users;
         }

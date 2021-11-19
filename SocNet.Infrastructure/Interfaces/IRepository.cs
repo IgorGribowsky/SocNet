@@ -23,5 +23,8 @@ namespace SocNet.Infrastructure.Interfaces
 
         public void DeleteById<TEntity>(int id) where TEntity : class;
         public Task DeleteByIdAsync<TEntity>(int id) where TEntity : class;
+
+        public Task DeleteAsync<TEntity>(TEntity entity) where TEntity : class;
+
     }
 }

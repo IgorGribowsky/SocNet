@@ -37,6 +37,14 @@ namespace SocNet.Infrastructure.EFRepository
             return entityEntry.Entity;
         }
 
+        public async Task DeleteAsync<TEntity>(TEntity item) where TEntity : class
+        {
+            var _dbSet = _context.Set<TEntity>();
+
+            _dbSet.Remove(item);
+            await _context.SaveChangesAsync();
+        }
+
         public void DeleteById<TEntity>(int id) where TEntity : class
         {
             var _dbSet = _context.Set<TEntity>();
