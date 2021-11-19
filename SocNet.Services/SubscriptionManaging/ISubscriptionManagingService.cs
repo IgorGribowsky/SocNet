@@ -17,6 +17,6 @@ namespace SocNet.Services.SubscriptionManaging
 
         public Task UnsubscribeFromUserByIdAsync(int subscriberUserId, int targetUserId);
 
-        public Task<bool> CheckSubscribtionExistance(int subscriberUserId, int targetUserId);
+        public Task<bool> CheckSubscriptionExistance(int subscriberUserId, int targetUserId);
     }
 }
