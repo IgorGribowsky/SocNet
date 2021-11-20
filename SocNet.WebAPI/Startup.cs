@@ -25,6 +25,7 @@ using SocNet.Services.AuthenticationManaging;
 using SocNet.Services.SubscriptionManaging;
 using SocNet.Core.Entities;
 using SocNet.WebAPI.StartupExtensionMethods;
+using SocNet.Services.LikesManaging;
 
 namespace SocNet.WebAPI
 {
@@ -49,10 +50,11 @@ namespace SocNet.WebAPI
             services.AddTransient<IPasswordHasher<UserIdentity>, PasswordHasher<UserIdentity>>();
 
             services.AddTransient<ISubscriptionManagingService, SubscriptionManagingService>();
+            services.AddTransient<ILikesManagingService, LikesManagingService>();
 
             services.AddTransient<IRepository, Repository>();
             services.AddControllers();
-
+w
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
