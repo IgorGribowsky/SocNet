@@ -54,7 +54,7 @@ namespace SocNet.WebAPI.Controllers
 
             if (requestedPost is null)
             {
-                return NotFound(new { message = "PPost doesn't exist" });
+                return NotFound(new { message = "Post doesn't exist" });
             }
 
             return Ok(requestedPost);
