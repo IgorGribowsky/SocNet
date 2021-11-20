@@ -43,18 +43,17 @@ namespace SocNet.WebAPI
         {
             services.AddTransient<IPostsManagingService, PostsManagingService>();
             services.AddTransient<IUsersManagingService, UsersManagingService>();
+            services.AddTransient<ISubscriptionManagingService, SubscriptionManagingService>();
+            services.AddTransient<ILikesManagingService, LikesManagingService>();
 
             services.AddTransient<ICustomAuthenticationService, AuthenticationMonoliticService>();
             services.AddTransient<IJwtManagingService, JwtManagingService>();
 
             services.AddTransient<IPasswordHasher<UserIdentity>, PasswordHasher<UserIdentity>>();
 
-            services.AddTransient<ISubscriptionManagingService, SubscriptionManagingService>();
-            services.AddTransient<ILikesManagingService, LikesManagingService>();
-
             services.AddTransient<IRepository, Repository>();
             services.AddControllers();
-w
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {

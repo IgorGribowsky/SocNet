@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SocNet.Infrastructure.Interfaces;
 using SocNet.Services.SubscriptionManaging;
+using SocNet.Services.LikesManaging;
 
 namespace SocNet.Services.PostsManaging
 {
@@ -14,12 +15,14 @@ namespace SocNet.Services.PostsManaging
     {
         private readonly IRepository _repository;
         private readonly ISubscriptionManagingService _subscriptionManager;
+        private readonly ILikesManagingService _likesManager;
 
 
-        public PostsManagingService(IRepository repository, ISubscriptionManagingService subscriptionManager)
+        public PostsManagingService(IRepository repository, ISubscriptionManagingService subscriptionManager, ILikesManagingService likesManager)
         {
             _repository = repository;
             _subscriptionManager = subscriptionManager;
+            _likesManager = likesManager;
         }
 
         public async Task<Post> CreateAsync(Post post)
@@ -33,6 +36,8 @@ namespace SocNet.Services.PostsManaging
         public async Task DeleteByIdAsync(int id)
         {
             await _repository.DeleteByIdAsync<Post>(id);
+
+            await _likesManager.DeleteAllLikesFromPostById(id);
         }
 
         public async Task<Post> GetByIdAsync(int id)
@@ -78,6 +83,27 @@ namespace SocNet.Services.PostsManaging
                 await Task.Run(() => _repository.Query<Post>().Where(p => p.UserId == id).Select(p => p).OrderByDescending(p => p.CreationTime).Skip(skippedPosts).Take(pageSize));
 
             return posts;
+        }
+        public async Task AddLikeByPostIdAsync(int userId, int postId)
+        {
+            await _likesManager.LikePostById(userId, postId);
+
+            var post = await _repository.GetByIdAsync<Post>(postId);
+
+            post.LikeCount++;
+
+            await _repository.UpdateAsync(post);
+        }
+
+        public async Task RemoveLikeByPostIdAsync(int userId, int postId)
+        {
+            await _likesManager.UnlikePostById(userId, postId);
+
+            var post = await _repository.GetByIdAsync<Post>(postId);
+
+            post.LikeCount--;
+
+            await _repository.UpdateAsync(post);
         }
 
         public async Task<bool> ValidatePostDataAsync(Post post)

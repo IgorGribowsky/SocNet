@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using SocNet.Core.Entities;
@@ -18,5 +19,7 @@ namespace SocNet.Services.AuthenticationManaging
         public Task<UserIdentity> SignUpAsync(SignupDto userData);
 
         public Task<bool> ChechUsernameUniquenessAsync(string username);
+
+        public bool TryGetUserId(ClaimsPrincipal user, out int userId);
     }
 }

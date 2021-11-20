@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using SocNet.Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace SocNet.Services.AuthenticationManaging
 {
@@ -86,6 +87,18 @@ namespace SocNet.Services.AuthenticationManaging
         public async Task<bool> ChechUsernameUniquenessAsync(string username)
         {
             return !await _repository.Query<UserIdentity>().AnyAsync(u => u.UserName == username);
+        }
+
+        public bool TryGetUserId(ClaimsPrincipal user, out int userId)
+        {
+            var userIdStr = user.Claims.FirstOrDefault(c => c.Type == "UserId").Value;
+            if (userIdStr is null || !int.TryParse(userIdStr, out userId))
+            {
+                userId = 0;
+                return false;
+            }
+
+            return true;
         }
     }
 }

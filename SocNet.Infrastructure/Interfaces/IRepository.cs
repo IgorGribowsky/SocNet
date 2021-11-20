@@ -11,6 +11,7 @@ namespace SocNet.Infrastructure.Interfaces
         public IQueryable<TEntity> Query<TEntity>() where TEntity : class;
 
         public TEntity GetById<TEntity>(int id) where TEntity : class;
+        public Task<TEntity> GetByIdAsync<TEntity>(int id) where TEntity : class;
 
         public IList<TEntity> GetAll<TEntity>() where TEntity : class;
         public Task<IList<TEntity>> GetAllAsync<TEntity>() where TEntity : class;
@@ -25,6 +26,8 @@ namespace SocNet.Infrastructure.Interfaces
         public Task DeleteByIdAsync<TEntity>(int id) where TEntity : class;
 
         public Task DeleteAsync<TEntity>(TEntity entity) where TEntity : class;
+
+        public Task DeleteManyAsync<TEntity>(IEnumerable<TEntity> entities) where TEntity : class;
 
     }
 }

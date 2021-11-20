@@ -15,7 +15,7 @@ namespace SocNet.Services.LikesManaging
     public class LikesManagingService : ILikesManagingService
     {
         private readonly IRepository _repository;
-        
+
         public LikesManagingService(IRepository repository)
         {
             _repository = repository;
@@ -24,6 +24,13 @@ namespace SocNet.Services.LikesManaging
         public async Task<bool> CheckIfPostLiked(int userId, int postId)
         {
             return await _repository.Query<Like>().AnyAsync(l => l.SenderUserId == userId && l.PostId == postId);
+        }
+
+        public async Task DeleteAllLikesFromPostById(int postId)
+        {
+            var likes = await _repository.Query<Like>().Where(l => l.PostId == postId).ToListAsync();
+
+            await _repository.DeleteManyAsync(likes);
         }
 
         public async Task<IEnumerable<Post>> GetLikedPostsByUserId(int id, RequestPageData pageData)

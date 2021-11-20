@@ -19,5 +19,7 @@ namespace SocNet.Services.LikesManaging
         public Task UnlikePostById(int userId, int postId);
 
         public Task<bool> CheckIfPostLiked(int userId, int postId);
+
+        public Task DeleteAllLikesFromPostById(int postId);
     }
 }
