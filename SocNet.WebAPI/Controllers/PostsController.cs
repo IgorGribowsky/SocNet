@@ -10,6 +10,9 @@ using SocNet.Core.Entities;
 using SocNet.Services.PostsManaging;
 using SocNet.WebAPI.Models;
 using System.Net.Mime;
+using SocNet.Services.LikesManaging;
+using SocNet.Services.AuthenticationManaging;
+using SocNet.Services.UtilityModels;
 
 namespace SocNet.WebAPI.Controllers
 {
@@ -20,11 +23,15 @@ namespace SocNet.WebAPI.Controllers
     {
         private readonly IPostsManagingService _postManager;
         private readonly ILogger<PostsController> _logger;
+        private readonly ILikesManagingService _likesManager;
+        private readonly ICustomAuthenticationService _authenticationManager;
 
-        public PostsController(IPostsManagingService postManager, ILogger<PostsController> logger)
+        public PostsController(IPostsManagingService postManager, ILogger<PostsController> logger, ILikesManagingService likesManager, ICustomAuthenticationService authenticationManager)
         {
             _postManager = postManager;
             _logger = logger;
+            _likesManager = likesManager;
+            _authenticationManager = authenticationManager;
         }
 
         [HttpGet]
@@ -41,13 +48,13 @@ namespace SocNet.WebAPI.Controllers
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Post))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Post>> GetById(int id)
+        public async Task<ActionResult<Post>> GetById([FromRoute] int id)
         {
             var requestedPost = await _postManager.GetByIdAsync(id);
 
             if (requestedPost is null)
             {
-                return NotFound(new { message = "PPost doesn't exist" });
+                return NotFound(new { message = "Post doesn't exist" });
             }
 
             return Ok(requestedPost);
@@ -106,13 +113,12 @@ namespace SocNet.WebAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            var userIdStr = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId").Value;
-            if (userIdStr is null || !int.TryParse(userIdStr, out var userId))
+            if (!_authenticationManager.TryGetUserId(HttpContext.User, out int userId))
             {
-                return Unauthorized();
+                return Unauthorized(new { message = "Provide valid bearer token" });
             }
 
-            var post = new Post { Content = postData.Content, UserId = userId, ParentPostId = postData.ParentPostId };
+            var post = new Post { Content = postData.Content, UserId = userId, ParentPostId = postData.ParentPostId > 0 ? postData.ParentPostId : null };
 
             if (!await _postManager.ValidatePostDataAsync(post))
             {
@@ -130,10 +136,9 @@ namespace SocNet.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult> Delete(int id)
         {
-            var userIdStr = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId").Value;
-            if (userIdStr is null || !int.TryParse(userIdStr, out var userId))
+            if (!_authenticationManager.TryGetUserId(HttpContext.User, out int userId))
             {
-                return Unauthorized();
+                return Unauthorized(new { message = "Provide valid bearer token" });
             }
 
             var targetPost = await _postManager.GetByIdAsync(id);
@@ -149,6 +154,93 @@ namespace SocNet.WebAPI.Controllers
             }
 
             await _postManager.DeleteByIdAsync(id);
+
+            return NoContent();
+        }
+
+        [HttpGet("{postId}/likes")]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<User>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<User>>> GetUsersThatLikedPost([FromRoute] int postId, [FromQuery] int page = 1, [FromQuery] int page_size = 10)
+        {
+            if (postId < 1)
+            {
+                return NotFound(new { message = "Post not found" });
+            }
+
+            var post = await _postManager.GetByIdAsync(postId);
+            if (post is null)
+            {
+                return NotFound(new { message = "Post not found" });
+            }
+
+            var users = await _likesManager.GetLikesByPostIdAsync(postId, new RequestPageData { PageIndex = page, PageSize = page_size });
+
+            return Ok(users);
+        }
+
+        [HttpPost("{postId}/likes")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<ActionResult> LikePostById([FromRoute] int postId)
+        {
+            if (!_authenticationManager.TryGetUserId(HttpContext.User, out int userId))
+            {
+                return Unauthorized(new { message = "Provide valid bearer token" });
+            }
+
+            if (postId < 1)
+            {
+                return NotFound(new { message = "Post not found"});
+            }
+
+            var post = await _postManager.GetByIdAsync(postId);
+            if (post is null)
+            {
+                return NotFound(new { message = "Post not found" });
+            }
+
+            if (await _likesManager.CheckIfPostLiked(userId, postId))
+            {
+                return BadRequest(new { message = "You already liked this post" });
+            }
+
+            await _postManager.AddLikeByPostIdAsync(userId, postId);
+            return NoContent();
+        }
+
+        [HttpDelete("{postId}/likes")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<ActionResult> UnlikePostById([FromRoute] int postId)
+        {
+            if (!_authenticationManager.TryGetUserId(HttpContext.User, out int userId))
+            {
+                return Unauthorized(new { message = "Provide valid bearer token" });
+            }
+
+            if (postId < 1)
+            {
+                return NotFound(new { message = "Post not found" });
+            }
+
+            var post = await _postManager.GetByIdAsync(postId);
+            if (post is null)
+            {
+                return NotFound(new { message = "Post not found" });
+            }
+
+            if (!await _likesManager.CheckIfPostLiked(userId, postId))
+            {
+                return BadRequest(new { message = "You don't like this post yet" });
+            }
+
+            await _postManager.RemoveLikeByPostIdAsync(userId, postId);
 
             return NoContent();
         }
