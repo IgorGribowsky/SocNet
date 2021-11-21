@@ -9,6 +9,8 @@ using SocNet.Core.Entities;
 using SocNet.Services.UsersManaging;
 using SocNet.Services.PostsManaging;
 using SocNet.Services.SubscriptionManaging;
+using SocNet.Services.LikesManaging;
+using SocNet.Services.UtilityModels;
 
 namespace SocNet.WebAPI.Controllers
 {
@@ -20,12 +22,14 @@ namespace SocNet.WebAPI.Controllers
         private readonly IUsersManagingService _usersManager;
         private readonly IPostsManagingService _postsManager;
         private readonly ISubscriptionManagingService _subscriptionManager;
+        private readonly ILikesManagingService _likesManager;
 
-        public UsersController(IUsersManagingService usersManager, IPostsManagingService postsManager, ISubscriptionManagingService subscriptionManager)
+        public UsersController(IUsersManagingService usersManager, IPostsManagingService postsManager, ISubscriptionManagingService subscriptionManager, ILikesManagingService likesManager)
         {
             _usersManager = usersManager;
             _postsManager = postsManager;
             _subscriptionManager = subscriptionManager;
+            _likesManager = likesManager;
         }
 
         [HttpGet("{id}")]
@@ -177,6 +181,28 @@ namespace SocNet.WebAPI.Controllers
             await _subscriptionManager.UnsubscribeFromUserByIdAsync(userId, id);
 
             return Ok();
+        }
+
+        [HttpGet("{userId}/likes")]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Post>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<User>>> GetLikedPostsByUserId([FromRoute] int userId, [FromQuery] int page = 1, [FromQuery] int page_size = 10)
+        {
+            if (userId < 1)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            var user = await _usersManager.GetByIdAsync(userId);
+            if (user is null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            var posts = await _likesManager.GetLikedPostsByUserId(userId, new RequestPageData { PageIndex = page, PageSize = page_size });
+
+            return Ok(posts);
         }
     }
 }
