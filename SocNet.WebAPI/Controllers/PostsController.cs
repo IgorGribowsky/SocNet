@@ -113,13 +113,12 @@ namespace SocNet.WebAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            var userIdStr = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId").Value;
-            if (userIdStr is null || !int.TryParse(userIdStr, out var userId))
+            if (!_authenticationManager.TryGetUserId(HttpContext.User, out int userId))
             {
-                return Unauthorized();
+                return Unauthorized(new { message = "Provide valid bearer token" });
             }
 
-            var post = new Post { Content = postData.Content, UserId = userId, ParentPostId = postData.ParentPostId };
+            var post = new Post { Content = postData.Content, UserId = userId, ParentPostId = postData.ParentPostId > 0 ? postData.ParentPostId : null };
 
             if (!await _postManager.ValidatePostDataAsync(post))
             {
