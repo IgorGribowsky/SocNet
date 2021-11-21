@@ -24,5 +24,9 @@ namespace SocNet.Services.PostsManaging
         public Task DeleteByIdAsync(int id);
 
         public Task<bool> ValidatePostDataAsync(Post post);
+
+        public Task AddLikeByPostIdAsync(int userId, int postId);
+
+        public Task RemoveLikeByPostIdAsync(int userId, int postId);
     }
 }

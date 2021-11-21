@@ -37,7 +37,7 @@ namespace SocNet.Services.AuthenticationManaging
                         new Claim("Id", user.Id.ToString()),
                         new Claim("UserId", user.UserId.ToString())
                     }),
-                Expires = DateTime.UtcNow.AddMinutes(1),
+                Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 

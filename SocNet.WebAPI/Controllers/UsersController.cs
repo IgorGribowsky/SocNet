@@ -9,6 +9,9 @@ using SocNet.Core.Entities;
 using SocNet.Services.UsersManaging;
 using SocNet.Services.PostsManaging;
 using SocNet.Services.SubscriptionManaging;
+using SocNet.Services.LikesManaging;
+using SocNet.Services.UtilityModels;
+using SocNet.Services.AuthenticationManaging;
 
 namespace SocNet.WebAPI.Controllers
 {
@@ -20,12 +23,16 @@ namespace SocNet.WebAPI.Controllers
         private readonly IUsersManagingService _usersManager;
         private readonly IPostsManagingService _postsManager;
         private readonly ISubscriptionManagingService _subscriptionManager;
+        private readonly ILikesManagingService _likesManager;
+        private readonly ICustomAuthenticationService _authenticationManager;
 
-        public UsersController(IUsersManagingService usersManager, IPostsManagingService postsManager, ISubscriptionManagingService subscriptionManager)
+        public UsersController(IUsersManagingService usersManager, IPostsManagingService postsManager, ISubscriptionManagingService subscriptionManager, ILikesManagingService likesManager, ICustomAuthenticationService authenticationManager)
         {
             _usersManager = usersManager;
             _postsManager = postsManager;
             _subscriptionManager = subscriptionManager;
+            _likesManager = likesManager;
+            _authenticationManager = authenticationManager;
         }
 
         [HttpGet("{id}")]
@@ -78,10 +85,9 @@ namespace SocNet.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<List<Post>>> GetFeed([FromQuery] int page = 1, [FromQuery] int page_size = 10)
         {
-            var userIdStr = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId").Value;
-            if (userIdStr is null || !int.TryParse(userIdStr, out var userId))
+            if (!_authenticationManager.TryGetUserId(HttpContext.User, out int userId))
             {
-                return Unauthorized();
+                return Unauthorized(new { message = "Provide valid bearer token" });
             }
 
             var posts = await _postsManager.GetFeedByUserIdAsync(id: userId, page: page, pageSize: page_size);
@@ -132,10 +138,9 @@ namespace SocNet.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Subscribe([FromRoute] int id)
         {
-            var subscriberIdStr = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId").Value;
-            if (subscriberIdStr is null || !int.TryParse(subscriberIdStr, out var subscriberId))
+            if (!_authenticationManager.TryGetUserId(HttpContext.User, out int subscriberId))
             {
-                return Unauthorized();
+                return Unauthorized(new { message = "Provide valid bearer token" });
             }
 
             var targetUser = await _usersManager.GetByIdAsync(id);
@@ -161,10 +166,9 @@ namespace SocNet.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Unsubscribe(int id)
         {
-            var userIdStr = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId").Value;
-            if (userIdStr is null || !int.TryParse(userIdStr, out var userId))
+            if (!_authenticationManager.TryGetUserId(HttpContext.User, out int userId))
             {
-                return Unauthorized();
+                return Unauthorized(new { message = "Provide valid bearer token" });
             }
 
             var requestedUser = await _usersManager.GetByIdAsync(id);
@@ -177,6 +181,28 @@ namespace SocNet.WebAPI.Controllers
             await _subscriptionManager.UnsubscribeFromUserByIdAsync(userId, id);
 
             return Ok();
+        }
+
+        [HttpGet("{userId}/likes")]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Post>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<User>>> GetLikedPostsByUserId([FromRoute] int userId, [FromQuery] int page = 1, [FromQuery] int page_size = 10)
+        {
+            if (userId < 1)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            var user = await _usersManager.GetByIdAsync(userId);
+            if (user is null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            var posts = await _likesManager.GetLikedPostsByUserId(userId, new RequestPageData { PageIndex = page, PageSize = page_size });
+
+            return Ok(posts);
         }
     }
 }

@@ -65,6 +65,18 @@ namespace SocNet.Infrastructure.EFRepository
             await _context.SaveChangesAsync();
         }
 
+        public async Task DeleteManyAsync<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
+        {
+            var _dbSet = _context.Set<TEntity>();
+
+            foreach (var entity in entities)
+            {
+                _dbSet.Remove(entity);
+            }
+            
+            await _context.SaveChangesAsync();
+        }
+
         public IList<TEntity> GetAll<TEntity>() where TEntity : class
         {
             var _dbSet = _context.Set<TEntity>();
@@ -84,6 +96,13 @@ namespace SocNet.Infrastructure.EFRepository
             var _dbSet = _context.Set<TEntity>();
 
             return _dbSet.Find(id);
+        }
+
+        public async Task<TEntity> GetByIdAsync<TEntity>(int id) where TEntity : class
+        {
+            var _dbSet = _context.Set<TEntity>();
+
+            return await _dbSet.FindAsync(id);
         }
 
         public IQueryable<TEntity> Query<TEntity>() where TEntity : class
