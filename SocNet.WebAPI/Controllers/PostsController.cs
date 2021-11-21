@@ -161,7 +161,7 @@ namespace SocNet.WebAPI.Controllers
 
         [HttpGet("{postId}/likes")]
         [AllowAnonymous]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Post>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<User>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<List<User>>> GetUsersThatLikedPost([FromRoute] int postId, [FromQuery] int page = 1, [FromQuery] int page_size = 10)
         {
