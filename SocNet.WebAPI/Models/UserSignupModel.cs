@@ -6,7 +6,7 @@ namespace SocNet.WebAPI.Models
     {
         [Required]
         [MinLength(6, ErrorMessage = "Minimum 6 characters")]
-        [MaxLength(20, ErrorMessage = "Maximum 20 characters")]
+        [MaxLength(30, ErrorMessage = "Maximum 30 characters")]
         public string Username { get; set; }
 
         [Required]
