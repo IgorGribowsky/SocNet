@@ -39,11 +39,6 @@ namespace SocNet.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<AuthenticationSuccessModel>> SignUp([FromBody] UserSignupModel signupData)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var isUsernameUnique = await _authService.ChechUsernameUniquenessAsync(signupData.Username);
 
             if (!isUsernameUnique)
@@ -72,11 +67,6 @@ namespace SocNet.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<AuthenticationSuccessModel>> SignIn([FromBody] AuthenticationModel credentials)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var user = await _authService.GetUSerIdentityByCredentialsAsync(userName: credentials.Username, password: credentials.Password);
 
             if (user is null)

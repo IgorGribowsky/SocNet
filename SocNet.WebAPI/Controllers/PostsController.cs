@@ -108,11 +108,6 @@ namespace SocNet.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<Post>> CreateAsync([FromBody] InputPostData postData)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             if (!_authenticationManager.TryGetUserId(HttpContext.User, out int userId))
             {
                 return Unauthorized(new { message = "Provide valid bearer token" });
