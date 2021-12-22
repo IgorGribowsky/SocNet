@@ -37,7 +37,7 @@ namespace SocNet.WebAPI.Controllers
         [HttpPost("signup")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AuthenticationSuccessModel))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<AuthenticationSuccessModel>> SignUp([FromBody] UserSignupModel signupData)
+        public async Task<ActionResult<AuthenticationSuccessModel>> SignUpAsync([FromBody] UserSignupModel signupData)
         {
             var isUsernameUnique = await _authService.ChechUsernameUniquenessAsync(signupData.Username);
 
@@ -56,16 +56,22 @@ namespace SocNet.WebAPI.Controllers
 
             AddAuthorizationHeader(user);
 
-            return CreatedAtAction(nameof(SignUp), new { id = user.UserId }, 
-                new AuthenticationSuccessModel { 
-                    UserId = user.UserId, Username = user.UserName 
+            // Controller name should be without "Controller" at the end
+            var usersControllerName = nameof(UsersController);
+                usersControllerName = usersControllerName.Substring(0, usersControllerName.LastIndexOf("Controller"));
+
+            return CreatedAtAction(nameof(UsersController.GetByIdAsync), usersControllerName, new { id = user.UserId },
+                new AuthenticationSuccessModel
+                {
+                    UserId = user.UserId,
+                    Username = user.UserName
                 });
         }
 
         [HttpPost("signin")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthenticationSuccessModel))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<AuthenticationSuccessModel>> SignIn([FromBody] AuthenticationModel credentials)
+        public async Task<ActionResult<AuthenticationSuccessModel>> SignInAsync([FromBody] AuthenticationModel credentials)
         {
             var user = await _authService.GetUSerIdentityByCredentialsAsync(userName: credentials.Username, password: credentials.Password);
 
@@ -86,7 +92,7 @@ namespace SocNet.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(int))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<int>> Validate([FromHeader(Name = "Authorization")] string token)
+        public async Task<ActionResult<int>> ValidateAsync([FromHeader(Name = "Authorization")] string token)
         {
             if (string.IsNullOrEmpty(token))
             {
