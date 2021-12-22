@@ -53,6 +53,8 @@ namespace SocNet.Services.AuthenticationManaging
                 return null;
             }
 
+            token = token.Replace("Bearer ", string.Empty);
+
             var tokenHandler = new JwtSecurityTokenHandler();
 
             var key = Encoding.UTF8.GetBytes(_jwtSecret);
@@ -69,7 +71,7 @@ namespace SocNet.Services.AuthenticationManaging
                 }, out SecurityToken validatedToken);
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
-                var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
+                var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "UserId").Value);
 
                 return userId;
             }
