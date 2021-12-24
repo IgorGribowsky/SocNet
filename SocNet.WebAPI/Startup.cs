@@ -52,7 +52,10 @@ namespace SocNet.WebAPI
             services.AddTransient<IPasswordHasher<UserIdentity>, PasswordHasher<UserIdentity>>();
 
             services.AddTransient<IRepository, Repository>();
-            services.AddControllers();
+            services.AddControllers(options =>
+            {
+                options.SuppressAsyncSuffixInActionNames = false;
+            });
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
