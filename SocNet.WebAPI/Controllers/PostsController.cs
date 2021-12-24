@@ -37,7 +37,7 @@ namespace SocNet.WebAPI.Controllers
         [HttpGet]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Post>))]
-        public async Task<ActionResult<List<Post>>> Get([FromQuery] int page = 1, [FromQuery] int page_size = 10)
+        public async Task<ActionResult<List<Post>>> GetAllAsync([FromQuery] int page = 1, [FromQuery] int page_size = 10)
         {
             var posts = await _postManager.GetPostsAsync(page: page, pageSize: page_size);
 
@@ -48,7 +48,7 @@ namespace SocNet.WebAPI.Controllers
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Post))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Post>> GetById([FromRoute] int id)
+        public async Task<ActionResult<Post>> GetByIdAsync([FromRoute] int id)
         {
             var requestedPost = await _postManager.GetByIdAsync(id);
 
@@ -64,7 +64,7 @@ namespace SocNet.WebAPI.Controllers
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Post))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Post>> GetParent(int id)
+        public async Task<ActionResult<Post>> GetParentAsync(int id)
         {
             var requestedPost = await _postManager.GetByIdAsync(id);
 
@@ -87,7 +87,7 @@ namespace SocNet.WebAPI.Controllers
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Post>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<Post>>> GetChildren(int id)
+        public async Task<ActionResult<List<Post>>> GetChildrenAsync(int id)
         {
             var requestedPost = await _postManager.GetByIdAsync(id);
 
@@ -108,11 +108,6 @@ namespace SocNet.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<Post>> CreateAsync([FromBody] InputPostData postData)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             if (!_authenticationManager.TryGetUserId(HttpContext.User, out int userId))
             {
                 return Unauthorized(new { message = "Provide valid bearer token" });
@@ -127,14 +122,14 @@ namespace SocNet.WebAPI.Controllers
 
             var publishedPost = await _postManager.CreateAsync(post);
 
-            return CreatedAtAction(nameof(GetById), new { id = publishedPost.Id }, publishedPost);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = publishedPost.Id }, publishedPost);
         }
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<ActionResult> DeleteAsync(int id)
         {
             if (!_authenticationManager.TryGetUserId(HttpContext.User, out int userId))
             {
@@ -162,7 +157,7 @@ namespace SocNet.WebAPI.Controllers
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<User>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<User>>> GetUsersThatLikedPost([FromRoute] int postId, [FromQuery] int page = 1, [FromQuery] int page_size = 10)
+        public async Task<ActionResult<List<User>>> GetUsersThatLikedPostAsync([FromRoute] int postId, [FromQuery] int page = 1, [FromQuery] int page_size = 10)
         {
             if (postId < 1)
             {
@@ -185,7 +180,7 @@ namespace SocNet.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<ActionResult> LikePostById([FromRoute] int postId)
+        public async Task<ActionResult> LikePostByIdAsync([FromRoute] int postId)
         {
             if (!_authenticationManager.TryGetUserId(HttpContext.User, out int userId))
             {
@@ -217,7 +212,7 @@ namespace SocNet.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<ActionResult> UnlikePostById([FromRoute] int postId)
+        public async Task<ActionResult> UnlikePostByIdAsync([FromRoute] int postId)
         {
             if (!_authenticationManager.TryGetUserId(HttpContext.User, out int userId))
             {

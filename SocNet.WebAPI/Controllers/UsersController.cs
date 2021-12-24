@@ -39,7 +39,7 @@ namespace SocNet.WebAPI.Controllers
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(User))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<User>> GetById(int id)
+        public async Task<ActionResult<User>> GetByIdAsync(int id)
         {
             var requestedUser = await _usersManager.GetByIdAsync(id);
 
@@ -65,7 +65,7 @@ namespace SocNet.WebAPI.Controllers
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Post>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<Post>>> GetPostsByUserId([FromRoute] int id, [FromQuery] int page = 1, [FromQuery] int page_size = 10)
+        public async Task<ActionResult<List<Post>>> GetPostsByUserIdAsync([FromRoute] int id, [FromQuery] int page = 1, [FromQuery] int page_size = 10)
         {
             var requestedUser = await _usersManager.GetByIdAsync(id);
 
@@ -83,7 +83,7 @@ namespace SocNet.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Post>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<List<Post>>> GetFeed([FromQuery] int page = 1, [FromQuery] int page_size = 10)
+        public async Task<ActionResult<List<Post>>> GetFeedAsync([FromQuery] int page = 1, [FromQuery] int page_size = 10)
         {
             if (!_authenticationManager.TryGetUserId(HttpContext.User, out int userId))
             {
@@ -99,7 +99,7 @@ namespace SocNet.WebAPI.Controllers
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<User>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> GetSubscriptions([FromRoute] int id)
+        public async Task<ActionResult> GetSubscriptionsAsync([FromRoute] int id)
         {
             var requestedUser = await _usersManager.GetByIdAsync(id);
 
@@ -136,7 +136,7 @@ namespace SocNet.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> Subscribe([FromRoute] int id)
+        public async Task<IActionResult> SubscribeAsync([FromRoute] int id)
         {
             if (!_authenticationManager.TryGetUserId(HttpContext.User, out int subscriberId))
             {
@@ -164,7 +164,7 @@ namespace SocNet.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> Unsubscribe(int id)
+        public async Task<IActionResult> UnsubscribeAsync(int id)
         {
             if (!_authenticationManager.TryGetUserId(HttpContext.User, out int userId))
             {
