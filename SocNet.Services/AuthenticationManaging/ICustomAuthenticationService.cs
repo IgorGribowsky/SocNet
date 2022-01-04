@@ -1,25 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
+﻿using System.Security.Claims;
 using System.Threading.Tasks;
 using SocNet.Core.Entities;
 
-namespace SocNet.Services.AuthenticationManaging
+namespace SocNet.Services.AuthenticationManaging;
+
+public interface ICustomAuthenticationService
 {
-    public interface ICustomAuthenticationService
-    {
-        public Task<int?> ValidateJwtAsync(string token);
+    public Task<int?> ValidateJwtAsync(string token);
 
-        public UserIdentity GetUSerIdentityById(int id);
+    public UserIdentity GetUSerIdentityById(int id);
 
-        public Task<UserIdentity> GetUSerIdentityByCredentialsAsync(string userName, string password);
+    public Task<UserIdentity> GetUSerIdentityByCredentialsAsync(string userName, string password);
 
-        public Task<UserIdentity> SignUpAsync(SignupDto userData);
+    public Task<UserIdentity> SignUpAsync(SignupDto userData);
 
-        public Task<bool> ChechUsernameUniquenessAsync(string username);
+    public Task<bool> ChechUsernameUniquenessAsync(string username);
 
-        public bool TryGetUserId(ClaimsPrincipal user, out int userId);
-    }
+    public bool TryGetUserId(ClaimsPrincipal user, out int userId);
 }

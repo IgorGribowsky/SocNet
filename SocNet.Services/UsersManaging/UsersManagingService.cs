@@ -1,36 +1,33 @@
 ﻿using SocNet.Core.Entities;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using SocNet.Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace SocNet.Services.UsersManaging
+namespace SocNet.Services.UsersManaging;
+
+public class UsersManagingService : IUsersManagingService
 {
-    public class UsersManagingService : IUsersManagingService
+    private readonly IRepository _repository;
+
+    public UsersManagingService(IRepository repository)
     {
-        private readonly IRepository _repository;
+        _repository = repository;
+    }
+    public async Task<User> GetByIdAsync(int id)
+    {
+        var user = await Task.Run(() => _repository.GetById<User>(id));
 
-        public UsersManagingService(IRepository repository)
-        {
-            _repository = repository;
-        }
-        public async Task<User> GetByIdAsync(int id)
-        {
-            var user = await Task.Run(() => _repository.GetById<User>(id));
+        return user;
+    }
 
-            return user;
-        }
+    public async Task<IEnumerable<User>> GetUsersAsync(int page, int pageSize)
+    {
+        var skippedUsers = (page - 1) * pageSize;
 
-        public async Task<IEnumerable<User>> GetUsersAsync(int page, int pageSize)
-        {
-            var skippedUsers = (page - 1) * pageSize;
+        var users = await _repository.Query<User>().OrderBy(u => u.Id).Skip(skippedUsers).Take(pageSize).ToListAsync();
 
-            var users = await _repository.Query<User>().OrderBy(u=>u.Id).Skip(skippedUsers).Take(pageSize).ToListAsync();
-
-            return users;
-        }
+        return users;
     }
 }

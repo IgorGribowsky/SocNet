@@ -1,133 +1,130 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SocNet.Infrastructure.Interfaces;
 
-namespace SocNet.Infrastructure.EFRepository
+namespace SocNet.Infrastructure.EFRepository;
+
+public class Repository : IRepository
 {
-    public class Repository : IRepository
+    private ApplicationContext _context;
+
+    public Repository(ApplicationContext context)
     {
-        private ApplicationContext _context;
+        _context = context;
+    }
 
-        public Repository(ApplicationContext context)
+    public TEntity Create<TEntity>(TEntity entity) where TEntity : class
+    {
+        var _dbSet = _context.Set<TEntity>();
+
+        var entityEntry = _dbSet.Add(entity);
+        _context.SaveChanges();
+
+        return entityEntry.Entity;
+    }
+
+    public async Task<TEntity> CreateAsync<TEntity>(TEntity entity) where TEntity : class
+    {
+        var _dbSet = _context.Set<TEntity>();
+
+        var entityEntry = _dbSet.Add(entity);
+        await _context.SaveChangesAsync();
+
+        return entityEntry.Entity;
+    }
+
+    public async Task DeleteAsync<TEntity>(TEntity item) where TEntity : class
+    {
+        var _dbSet = _context.Set<TEntity>();
+
+        _dbSet.Remove(item);
+        await _context.SaveChangesAsync();
+    }
+
+    public void DeleteById<TEntity>(int id) where TEntity : class
+    {
+        var _dbSet = _context.Set<TEntity>();
+
+        var item = _dbSet.Find(id);
+
+        _dbSet.Remove(item);
+        _context.SaveChanges();
+    }
+
+    public async Task DeleteByIdAsync<TEntity>(int id) where TEntity : class
+    {
+        var _dbSet = _context.Set<TEntity>();
+
+        var item = _dbSet.Find(id);
+
+        _dbSet.Remove(item);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteManyAsync<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
+    {
+        var _dbSet = _context.Set<TEntity>();
+
+        foreach (var entity in entities)
         {
-            _context = context;
+            _dbSet.Remove(entity);
         }
 
-        public TEntity Create<TEntity>(TEntity entity) where TEntity : class
-        {
-            var _dbSet = _context.Set<TEntity>();
+        await _context.SaveChangesAsync();
+    }
 
-            var entityEntry = _dbSet.Add(entity);
-            _context.SaveChanges();
+    public IList<TEntity> GetAll<TEntity>() where TEntity : class
+    {
+        var _dbSet = _context.Set<TEntity>();
 
-            return entityEntry.Entity;
-        }
+        return _dbSet.ToList();
+    }
 
-        public async Task<TEntity> CreateAsync<TEntity>(TEntity entity) where TEntity : class
-        {
-            var _dbSet = _context.Set<TEntity>();
+    public async Task<IList<TEntity>> GetAllAsync<TEntity>() where TEntity : class
+    {
+        var _dbSet = _context.Set<TEntity>();
 
-            var entityEntry = _dbSet.Add(entity);
-            await _context.SaveChangesAsync();
+        return await _dbSet.ToListAsync();
+    }
 
-            return entityEntry.Entity;
-        }
+    public TEntity GetById<TEntity>(int id) where TEntity : class
+    {
+        var _dbSet = _context.Set<TEntity>();
 
-        public async Task DeleteAsync<TEntity>(TEntity item) where TEntity : class
-        {
-            var _dbSet = _context.Set<TEntity>();
+        return _dbSet.Find(id);
+    }
 
-            _dbSet.Remove(item);
-            await _context.SaveChangesAsync();
-        }
+    public async Task<TEntity> GetByIdAsync<TEntity>(int id) where TEntity : class
+    {
+        var _dbSet = _context.Set<TEntity>();
 
-        public void DeleteById<TEntity>(int id) where TEntity : class
-        {
-            var _dbSet = _context.Set<TEntity>();
+        return await _dbSet.FindAsync(id);
+    }
 
-            var item = _dbSet.Find(id);
+    public IQueryable<TEntity> Query<TEntity>() where TEntity : class
+    {
+        var _dbSet = _context.Set<TEntity>();
 
-            _dbSet.Remove(item);
-            _context.SaveChanges();
-        }
+        return _dbSet.AsNoTracking();
+    }
 
-        public async Task DeleteByIdAsync<TEntity>(int id) where TEntity : class
-        {
-            var _dbSet = _context.Set<TEntity>();
+    public void Update<TEntity>(TEntity entity) where TEntity : class
+    {
+        var _dbSet = _context.Set<TEntity>();
 
-            var item = _dbSet.Find(id);
+        _dbSet.Attach(entity);
+        _context.Entry(entity).State = EntityState.Modified;
+        _context.SaveChanges();
+    }
 
-            _dbSet.Remove(item);
-            await _context.SaveChangesAsync();
-        }
+    public async Task UpdateAsync<TEntity>(TEntity entity) where TEntity : class
+    {
+        var _dbSet = _context.Set<TEntity>();
 
-        public async Task DeleteManyAsync<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
-        {
-            var _dbSet = _context.Set<TEntity>();
-
-            foreach (var entity in entities)
-            {
-                _dbSet.Remove(entity);
-            }
-            
-            await _context.SaveChangesAsync();
-        }
-
-        public IList<TEntity> GetAll<TEntity>() where TEntity : class
-        {
-            var _dbSet = _context.Set<TEntity>();
-
-            return _dbSet.ToList();
-        }
-
-        public async Task<IList<TEntity>> GetAllAsync<TEntity>() where TEntity : class
-        {
-            var _dbSet = _context.Set<TEntity>();
-
-            return await _dbSet.ToListAsync();
-        }
-
-        public TEntity GetById<TEntity>(int id) where TEntity : class
-        {
-            var _dbSet = _context.Set<TEntity>();
-
-            return _dbSet.Find(id);
-        }
-
-        public async Task<TEntity> GetByIdAsync<TEntity>(int id) where TEntity : class
-        {
-            var _dbSet = _context.Set<TEntity>();
-
-            return await _dbSet.FindAsync(id);
-        }
-
-        public IQueryable<TEntity> Query<TEntity>() where TEntity : class
-        {
-            var _dbSet = _context.Set<TEntity>();
-
-            return _dbSet.AsNoTracking();
-        }
-
-        public void Update<TEntity>(TEntity entity) where TEntity : class
-        {
-            var _dbSet = _context.Set<TEntity>();
-
-            _dbSet.Attach(entity);
-            _context.Entry(entity).State = EntityState.Modified;
-            _context.SaveChanges();
-        }
-
-        public async Task UpdateAsync<TEntity>(TEntity entity) where TEntity : class
-        {
-            var _dbSet = _context.Set<TEntity>();
-
-            _dbSet.Attach(entity);
-            _context.Entry(entity).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-        }
+        _dbSet.Attach(entity);
+        _context.Entry(entity).State = EntityState.Modified;
+        await _context.SaveChangesAsync();
     }
 }

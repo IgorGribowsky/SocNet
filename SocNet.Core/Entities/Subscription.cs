@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace SocNet.Core.Entities;
 
-namespace SocNet.Core.Entities
+public class Subscription
 {
-    public class Subscription
-    {
-        public int SubscriberUserId { get; set; }
+    public int SubscriberUserId { get; set; }
 
-        public int TargetUserId { get; set; }
-    }
+    public int TargetUserId { get; set; }
 }
