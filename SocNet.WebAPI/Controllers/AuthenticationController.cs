@@ -14,7 +14,6 @@ public class AuthenticationController : ControllerBase
 {
     private readonly ILogger<AuthenticationController> _logger;
 
-
     private readonly IJwtManagingService _jwtManager;
 
     private readonly ICustomAuthenticationService _authService;
