@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace SocNet.Services.UtilityModels;
 
-namespace SocNet.Services.UtilityModels
+public class RequestPageData
 {
-    public class RequestPageData
-    {
-        public int PageIndex { get; set; }
+    public int PageIndex { get; set; }
 
-        public int PageSize { get; set; }
+    public int PageSize { get; set; }
 
-        public int SkippedEntities { get { return (PageIndex - 1) * PageSize; } }
+    public int SkippedEntities { get { return (PageIndex - 1) * PageSize; } }
 
-    }
 }
