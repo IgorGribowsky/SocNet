@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
 using SocNet.Core.Entities;
+using SocNet.Services.Dtos;
 
 namespace SocNet.Services.AuthenticationManaging;
 

@@ -11,6 +11,7 @@ using SocNet.WebAPI.Models;
 using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace SocNet.WebAPI.Controllers;
 
@@ -23,13 +24,15 @@ public class PostsController : ControllerBase
     private readonly ILogger<PostsController> _logger;
     private readonly ILikesManagingService _likesManager;
     private readonly ICustomAuthenticationService _authenticationManager;
+    private readonly IMapper _mapper;
 
-    public PostsController(IPostsManagingService postManager, ILogger<PostsController> logger, ILikesManagingService likesManager, ICustomAuthenticationService authenticationManager)
+    public PostsController(IPostsManagingService postManager, ILogger<PostsController> logger, ILikesManagingService likesManager, ICustomAuthenticationService authenticationManager, IMapper mapper)
     {
         _postManager = postManager;
         _logger = logger;
         _likesManager = likesManager;
         _authenticationManager = authenticationManager;
+        _mapper = mapper;
     }
 
     [HttpGet]
@@ -111,7 +114,7 @@ public class PostsController : ControllerBase
             return Unauthorized(new { message = "Provide valid bearer token" });
         }
 
-        var post = new Post { Content = postData.Content, UserId = userId, ParentPostId = postData.ParentPostId > 0 ? postData.ParentPostId : null };
+        var post = _mapper.Map<Post>(postData);
 
         if (!await _postManager.ValidatePostDataAsync(post))
         {

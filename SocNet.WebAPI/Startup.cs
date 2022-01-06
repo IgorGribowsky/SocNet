@@ -18,6 +18,7 @@ using SocNet.Services.UsersManaging;
 using SocNet.WebAPI.StartupExtensionMethods;
 using System;
 using System.Text;
+using AutoMapper;
 
 namespace SocNet.WebAPI;
 
@@ -42,6 +43,8 @@ public class Startup
         services.AddTransient<IJwtManagingService, JwtManagingService>();
 
         services.AddTransient<IPasswordHasher<UserIdentity>, PasswordHasher<UserIdentity>>();
+
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         services.AddTransient<IRepository, Repository>();
         services.AddControllers(options =>
