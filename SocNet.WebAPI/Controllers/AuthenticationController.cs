@@ -5,6 +5,8 @@ using SocNet.Core.Entities;
 using SocNet.Services.AuthenticationManaging;
 using SocNet.WebAPI.Models;
 using System.Threading.Tasks;
+using AutoMapper;
+using SocNet.Services.Dtos;
 
 namespace SocNet.WebAPI.Controllers;
 
@@ -18,14 +20,18 @@ public class AuthenticationController : ControllerBase
 
     private readonly ICustomAuthenticationService _authService;
 
+    private readonly IMapper _mapper;
+
     public AuthenticationController(
         ILogger<AuthenticationController> logger,
         IJwtManagingService jwtManager,
-        ICustomAuthenticationService userValidator)
+        ICustomAuthenticationService userValidator,
+        IMapper mapper)
     {
         _logger = logger;
         _jwtManager = jwtManager;
         _authService = userValidator;
+        _mapper = mapper;
     }
 
     [HttpPost("signup")]
@@ -40,13 +46,9 @@ public class AuthenticationController : ControllerBase
             return BadRequest(new { message = "Username already taken" });
         }
 
-        var user = await _authService.SignUpAsync(
-                    new SignupDto(
-                        Username: signupData.Username,
-                        Password: signupData.Password,
-                        FirstName: signupData.FirstName,
-                        LastName: signupData.LastName
-                    ));
+        var signupDto = _mapper.Map<SignupDto>(signupData);
+
+        var user = await _authService.SignUpAsync(signupDto);
 
         AddAuthorizationHeader(user);
 

@@ -7,5 +7,5 @@ public class InputPostData
     [Required]
     public string Content { get; set; }
 
-    public int ParentPostId { get; set; }
+    public int? ParentPostId { get; set; }
 }

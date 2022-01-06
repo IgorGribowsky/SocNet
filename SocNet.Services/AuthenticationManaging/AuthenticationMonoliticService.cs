@@ -5,10 +5,9 @@ using SocNet.Infrastructure.Interfaces;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using SocNet.Services.Dtos;
 
 namespace SocNet.Services.AuthenticationManaging;
-
-public record SignupDto(string Username, string Password, string FirstName, string LastName);
 
 public class AuthenticationMonoliticService : ICustomAuthenticationService
 {
